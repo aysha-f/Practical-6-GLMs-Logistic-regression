@@ -1,0 +1,15 @@
+---
+title: "Practical 6 Answers"
+subtitle: "GLMs: Logistic regression"
+author: "Aysha Flueck"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: false
+    link-external-newwindow: true
+    link-external-icon: true
+editor: source
+---
+
