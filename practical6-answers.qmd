@@ -13,3 +13,94 @@ format:
 editor: source
 ---
 
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+# Load the packages you need for this practical.
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(tibble)
+library(tidyr)
+library(naniar)
+
+titanic <- read.csv("data/titanic.csv")
+```
+
+## Titanic survival data
+
+### Question 1
+*Read the data in using read_csv and inspect for missingness and other data irregularities.*
+```{r}
+glimpse(titanic)
+
+titanic |> filter(cabin == "") |> count()
+titanic |> filter(boat == "") |> count()
+titanic |> filter(home.dest == "") |> count()
+
+```
+
+`cabin`, `boat`, and `home.dest` all have missing entries whcih have been incorrectly coded as blank rather than `NA`.
+
+```{r}
+titanic <- titanic |>
+  mutate(
+    cabin = na_if(cabin, ""),
+    boat = na_if(boat, ""),
+    home.dest = na_if(home.dest, ""))
+```
+
+
+```{r}
+miss_var_summary(titanic)
+vis_miss(titanic)
+gg_miss_upset(titanic)
+
+titanic |> group_by(survived) |>
+  miss_var_summary() |>
+  filter(n_miss > 0)
+
+titanic |> group_by(pclass) |>
+  miss_var_summary() |>
+  filter(n_miss > 0)
+```
+
+`body` and `boat` have a lot of missingness (1188 and 823), which is to be expected by construction. `boat` is almost exclusively recorded for survivors, and `body` only for the recovered non-survivors. 
+
+- `cabin` is missing 1014, mostly for 2nd and 3rd class passengers.
+- `home.dest` is missing 564.
+- `age` is missing 263.
+
+### Question 2
+*Tidy the data, what variables should be logical/binary, factors, or numerical? And should the factor variables be ordered?*
+
+`pclass`, `sex` and `embarked` should be factors.
+```{r}
+titanic <- titanic |>
+  mutate(
+    survived = survived == 1,
+    pclass = factor(pclass, levels = c("1st", "2nd", "3rd"), ordered = TRUE),
+    sex = factor(sex),
+    embarked = factor(embarked)
+  )
+```
+
+### Question 3
+*Construct a new logical/binary variable `accompanied` to record if a passenger was accompanied by any relatives.*
+```{r}
+titanic <- titanic |>
+  mutate(accompanied = (sibsp + parch) > 0)
+
+titanic |> count(accompanied)
+```
+
+### Question 4
+*Create plot(s) visualising the relative proportions of survival by different categories (similar to the above plot). Describe the relationships, do the relationships make sense?*
+
+```{r}
+
+```
+
+
